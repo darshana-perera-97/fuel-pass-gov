@@ -1,0 +1,35 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  * {
+    @apply border-gray-100;
+  }
+  body {
+    @apply bg-white text-gray-900 antialiased;
+  }
+}
+
+.leaflet-container {
+  font-family: inherit;
+}
+.leaflet-popup-content-wrapper {
+  border-radius: 8px;
+}
+
+/* Ensure Leaflet popups render above surrounding UI */
+.leaflet-pane.leaflet-popup-pane {
+  z-index: 9999;
+}
+.leaflet-popup {
+  z-index: 10000;
+}
+
+@keyframes caret-blink {
+  0%, 70% { opacity: 1; }
+  71%, 100% { opacity: 0; }
+}
+.animate-caret-blink {
+  animation: caret-blink 1.25s step-end infinite;
+}

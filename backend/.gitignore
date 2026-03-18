@@ -1,0 +1,33 @@
+# Dependencies
+node_modules/
+
+# Environment and secrets
+.env
+.env.local
+.env.*.local
+
+# WhatsApp Web.js session and cache (do not commit)
+.wwebjs_auth/
+.wwebjs_cache/
+
+# Logs
+logs/
+*.log
+npm-debug.log*
+
+# OS and editor
+.DS_Store
+Thumbs.db
+*.swp
+*.swo
+.idea/
+.vscode/
+
+
+data
+
+src/.wwebjs_auth
+src/.wwebjs_cache
+
+# Optional: local data overrides (uncomment if you keep dev data separate)
+# data/*.local.json
