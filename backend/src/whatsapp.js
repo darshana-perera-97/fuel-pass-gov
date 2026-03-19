@@ -5,6 +5,7 @@ const fs = require('fs');
 
 let client = null;
 let ready = false;
+let initAttempts = 0;
 
 function pickExecutablePath() {
   const explicit =
@@ -30,6 +31,7 @@ function startWhatsApp() {
   if (client) return client;
 
   const executablePath = pickExecutablePath();
+  initAttempts += 1;
   client = new Client({
     authStrategy: new LocalAuth({ clientId: 'fuel-pass-gov' }),
     puppeteer: {
@@ -37,11 +39,15 @@ function startWhatsApp() {
         '--no-sandbox',
         '--disable-setuid-sandbox',
         '--disable-dev-shm-usage',
-        '--disable-gpu',
         '--no-first-run',
-        '--single-process',
+        '--disable-features=site-per-process',
+        '--disable-features=IsolateOrigins',
+        '--disable-background-timer-throttling',
+        '--disable-backgrounding-occluded-windows',
+        '--disable-renderer-backgrounding',
       ],
-      headless: true,
+      // Prefer the newer headless mode when available.
+      headless: 'new',
       ...(executablePath ? { executablePath } : {}),
     },
   });
@@ -74,6 +80,20 @@ function startWhatsApp() {
       '[WhatsApp] Ubuntu fix: install Chromium/Chrome and dependencies, or run with DISABLE_WHATSAPP=1. ' +
       'Optional: set CHROME_PATH or PUPPETEER_EXECUTABLE_PATH to your browser binary.'
     );
+
+    // Some failures (e.g. "Navigating frame was detached") can be transient. Retry a few times.
+    if (initAttempts < 4 && String(process.env.DISABLE_WHATSAPP || '').trim() !== '1') {
+      const delayMs = 5000 * initAttempts;
+      // eslint-disable-next-line no-console
+      console.log(`[WhatsApp] Retrying initialization in ${delayMs}ms (attempt ${initAttempts + 1}/4)...`);
+      setTimeout(() => {
+        try {
+          startWhatsApp();
+        } catch {
+          // ignore - the next retry will handle it
+        }
+      }, delayMs);
+    }
   });
   return client;
 }
