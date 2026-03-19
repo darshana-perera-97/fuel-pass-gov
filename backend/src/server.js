@@ -149,6 +149,14 @@ app.get('/api/health', (_req, res) => {
   res.json({ ok: true });
 });
 
+app.get('/api/whatsapp/status', (_req, res) => {
+  const disabled = String(process.env.DISABLE_WHATSAPP || '').trim() === '1';
+  return res.json({
+    disabled,
+    ready: disabled ? false : Boolean(isWhatsAppReady()),
+  });
+});
+
 // Return all users from users.json for admin (no passwordHash). Used for "Filling station login credentials" in admin.
 app.get('/api/admin/users', async (_req, res) => {
   try {
