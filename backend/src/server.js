@@ -869,7 +869,7 @@ app.post('/api/customers/register', async (req, res) => {
   }
 });
 
-const port = process.env.PORT ? Number(process.env.PORT) : 5050;
+const port = process.env.PORT ? Number(process.env.PORT) : 5051;
 
 // Serve the built frontend (Vite) from this backend in production-like runs.
 // Build output is expected at: <repoRoot>/frontend/dist
