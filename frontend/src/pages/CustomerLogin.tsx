@@ -12,7 +12,6 @@ import { customerLogin, getFuelQuotas, getVehicleTransactions, sendCustomerOtp, 
 
 export function CustomerLogin() {
   const navigate = useNavigate();
-  const [step, setStep] = useState(1);
   const [nic, setNic] = useState('');
   const [phone, setPhone] = useState('');
   const [otp, setOtp] = useState('');
@@ -123,34 +122,32 @@ export function CustomerLogin() {
 
         {!customer ? (
           <Card className="border-gray-100 p-6">
-            {step === 1 && (
-              <div className="space-y-4">
-                <div>
-                  <Label className="text-gray-700">NIC</Label>
-                  <Input
-                    placeholder="e.g. 972060909V"
-                    value={nic}
-                    onChange={(e) => setNic(e.target.value.toUpperCase())}
-                    className="mt-1"
-                  />
-                </div>
-                <div>
-                  <Label className="text-gray-700">Contact number</Label>
-                  <Input
-                    placeholder="07XXXXXXXX"
-                    value={phone}
-                    onChange={(e) => setPhone(e.target.value.replace(/\D/g, '').slice(0, 10))}
-                    className="mt-1"
-                  />
-                </div>
-                <Button className="w-full" onClick={handleSendOTP} disabled={loading}>
-                  {loading ? 'Sending…' : 'Send OTP'}
-                </Button>
-                {otpSent && (
-                  <p className="text-center text-sm text-gray-500">OTP sent. Enter it below and click Verify & login.</p>
-                )}
+            <div className="space-y-4">
+              <div>
+                <Label className="text-gray-700">NIC</Label>
+                <Input
+                  placeholder="e.g. 972060909V"
+                  value={nic}
+                  onChange={(e) => setNic(e.target.value.toUpperCase())}
+                  className="mt-1"
+                />
               </div>
-            )}
+              <div>
+                <Label className="text-gray-700">Contact number</Label>
+                <Input
+                  placeholder="07XXXXXXXX"
+                  value={phone}
+                  onChange={(e) => setPhone(e.target.value.replace(/\D/g, '').slice(0, 10))}
+                  className="mt-1"
+                />
+              </div>
+              <Button className="w-full" onClick={handleSendOTP} disabled={loading}>
+                {loading ? 'Sending…' : 'Send OTP'}
+              </Button>
+              {otpSent && (
+                <p className="text-center text-sm text-gray-500">OTP sent. Enter it below and click Verify & login.</p>
+              )}
+            </div>
 
             {otpSent && (
               <div className="mt-6 space-y-4 border-t border-gray-100 pt-6">

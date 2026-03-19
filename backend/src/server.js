@@ -1,6 +1,7 @@
 const express = require('express');
 const cors = require('cors');
 const path = require('path');
+const fsSync = require('fs');
 const fs = require('fs/promises');
 const bcrypt = require('bcryptjs');
 const { startWhatsApp, isReady: isWhatsAppReady, sendOtpWhatsApp, sendQrImageWhatsApp, sendTextWhatsApp } = require('./whatsapp');
@@ -869,6 +870,19 @@ app.post('/api/customers/register', async (req, res) => {
 });
 
 const port = process.env.PORT ? Number(process.env.PORT) : 5050;
+
+// Serve the built frontend (Vite) from this backend in production-like runs.
+// Build output is expected at: <repoRoot>/frontend/dist
+const frontendDistPath = path.join(__dirname, '..', '..', 'frontend', 'dist');
+if (fsSync.existsSync(frontendDistPath)) {
+  app.use(express.static(frontendDistPath));
+
+  // SPA fallback (React Router) for non-API routes.
+  app.get(/^\/(?!api\/).*/, (req, res) => {
+    res.sendFile(path.join(frontendDistPath, 'index.html'));
+  });
+}
+
 app.listen(port, () => {
   // eslint-disable-next-line no-console
   console.log(`Backend listening on http://localhost:${port}`);

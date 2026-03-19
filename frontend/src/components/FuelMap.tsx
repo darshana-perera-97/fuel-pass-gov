@@ -1,10 +1,10 @@
 import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet';
 import { Icon, LatLngBounds } from 'leaflet';
-import type { FillingStation } from '@/data/mockData';
+import type { Station } from '@/lib/api';
 import { Badge } from '@/components/ui/badge';
 import { Fuel, Droplet } from 'lucide-react';
 
-type StationWithTransit = FillingStation & { inTransitPetrol?: number; inTransitDiesel?: number };
+type StationWithTransit = Station;
 
 interface FuelMapProps {
   stations: StationWithTransit[];

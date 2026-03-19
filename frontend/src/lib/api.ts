@@ -1,4 +1,4 @@
-const API_BASE = (import.meta as any).env?.VITE_API_URL || 'http://localhost:5050';
+import { API_BASE_URL } from '@/config';
 
 export type LoginRole = 'admin' | 'station' | 'operator';
 
@@ -20,7 +20,7 @@ export interface LoginResponse {
 }
 
 export async function login(req: LoginRequest): Promise<LoginResponse> {
-  const res = await fetch(`${API_BASE}/api/auth/login`, {
+  const res = await fetch(`${API_BASE_URL}/api/auth/login`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(req),
@@ -42,7 +42,7 @@ export interface ApiUser {
 }
 
 export async function getAdminUsers(): Promise<ApiUser[]> {
-  const res = await fetch(`${API_BASE}/api/admin/users`);
+  const res = await fetch(`${API_BASE_URL}/api/admin/users`);
   if (!res.ok) throw new Error('Failed to load users');
   const data = await res.json();
   return data.users ?? [];
@@ -57,7 +57,7 @@ export interface StationOperator extends ApiUser {
 }
 
 export async function getStationOperators(stationId: string): Promise<StationOperator[]> {
-  const res = await fetch(`${API_BASE}/api/stations/${encodeURIComponent(stationId)}/operators`);
+  const res = await fetch(`${API_BASE_URL}/api/stations/${encodeURIComponent(stationId)}/operators`);
   if (!res.ok) throw new Error('Failed to load operators');
   const data = await res.json();
   return data.operators ?? [];
@@ -69,7 +69,7 @@ export async function createStationOperator(params: {
   phone?: string;
   password?: string;
 }): Promise<{ operator: StationOperator; credentials: { operatorId: string; password: string } }> {
-  const res = await fetch(`${API_BASE}/api/stations/${encodeURIComponent(params.stationId)}/operators`, {
+  const res = await fetch(`${API_BASE_URL}/api/stations/${encodeURIComponent(params.stationId)}/operators`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ name: params.name, phone: params.phone, password: params.password }),
@@ -90,14 +90,14 @@ export interface FuelQuota {
 }
 
 export async function getFuelQuotas(): Promise<FuelQuota[]> {
-  const res = await fetch(`${API_BASE}/api/admin/fuel-quotas`);
+  const res = await fetch(`${API_BASE_URL}/api/admin/fuel-quotas`);
   if (!res.ok) throw new Error('Failed to load fuel quotas');
   const data = await res.json();
   return data.quotas ?? [];
 }
 
 export async function saveFuelQuotas(quotas: FuelQuota[]): Promise<void> {
-  const res = await fetch(`${API_BASE}/api/admin/fuel-quotas`, {
+  const res = await fetch(`${API_BASE_URL}/api/admin/fuel-quotas`, {
     method: 'PUT',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ quotas }),
@@ -125,7 +125,7 @@ export interface VehicleTransaction extends StationTransaction {
 }
 
 export async function getStationTransactions(stationId: string): Promise<StationTransaction[]> {
-  const res = await fetch(`${API_BASE}/api/stations/${encodeURIComponent(stationId)}/transactions`);
+  const res = await fetch(`${API_BASE_URL}/api/stations/${encodeURIComponent(stationId)}/transactions`);
   if (!res.ok) throw new Error('Failed to load transactions');
   const data = await res.json();
   return data.transactions ?? [];
@@ -134,7 +134,7 @@ export async function getStationTransactions(stationId: string): Promise<Station
 export async function getVehicleTransactions(vehicleNumber: string, limit = 10): Promise<VehicleTransaction[]> {
   const vn = String(vehicleNumber || '').trim();
   if (!vn) return [];
-  const url = new URL(`${API_BASE}/api/transactions`);
+  const url = new URL(`${API_BASE_URL}/api/transactions`);
   url.searchParams.set('vehicleNumber', vn);
   url.searchParams.set('limit', String(limit));
   const res = await fetch(url.toString());
@@ -150,7 +150,7 @@ export async function createStationTransaction(params: {
   fuelType: FuelType;
   operatorId?: string;
 }): Promise<StationTransaction> {
-  const res = await fetch(`${API_BASE}/api/stations/${encodeURIComponent(params.stationId)}/transactions`, {
+  const res = await fetch(`${API_BASE_URL}/api/stations/${encodeURIComponent(params.stationId)}/transactions`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({
@@ -180,14 +180,14 @@ export interface Delivery {
 }
 
 export async function getStationDeliveries(stationId: string): Promise<Delivery[]> {
-  const res = await fetch(`${API_BASE}/api/stations/${encodeURIComponent(stationId)}/deliveries`);
+  const res = await fetch(`${API_BASE_URL}/api/stations/${encodeURIComponent(stationId)}/deliveries`);
   if (!res.ok) throw new Error('Failed to load deliveries');
   const data = await res.json();
   return data.deliveries ?? [];
 }
 
 export async function getAdminDeliveries(): Promise<Delivery[]> {
-  const res = await fetch(`${API_BASE}/api/admin/deliveries`);
+  const res = await fetch(`${API_BASE_URL}/api/admin/deliveries`);
   if (!res.ok) throw new Error('Failed to load deliveries');
   const data = await res.json();
   return data.deliveries ?? [];
@@ -198,7 +198,7 @@ export async function createDelivery(params: {
   fuelType: FuelType;
   liters: number;
 }): Promise<Delivery> {
-  const res = await fetch(`${API_BASE}/api/admin/deliveries`, {
+  const res = await fetch(`${API_BASE_URL}/api/admin/deliveries`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(params),
@@ -212,7 +212,7 @@ export async function createDelivery(params: {
 }
 
 export async function updateDeliveryStatus(deliveryId: string, status: DeliveryStatus): Promise<Delivery> {
-  const res = await fetch(`${API_BASE}/api/admin/deliveries/${encodeURIComponent(deliveryId)}`, {
+  const res = await fetch(`${API_BASE_URL}/api/admin/deliveries/${encodeURIComponent(deliveryId)}`, {
     method: 'PATCH',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ status }),
@@ -234,7 +234,7 @@ export interface SpecialVehicle {
 }
 
 export async function getSpecialVehicles(): Promise<SpecialVehicle[]> {
-  const res = await fetch(`${API_BASE}/api/admin/special-vehicles`);
+  const res = await fetch(`${API_BASE_URL}/api/admin/special-vehicles`);
   if (!res.ok) throw new Error('Failed to load special vehicles');
   const data = await res.json();
   return data.specialVehicles ?? [];
@@ -245,7 +245,7 @@ export async function createSpecialVehicle(params: {
   vehicleType: string;
   fuelQuota: number;
 }): Promise<SpecialVehicle> {
-  const res = await fetch(`${API_BASE}/api/admin/special-vehicles`, {
+  const res = await fetch(`${API_BASE_URL}/api/admin/special-vehicles`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(params),
@@ -278,21 +278,21 @@ export interface Station {
 }
 
 export async function getStations(): Promise<Station[]> {
-  const res = await fetch(`${API_BASE}/api/admin/stations`);
+  const res = await fetch(`${API_BASE_URL}/api/admin/stations`);
   if (!res.ok) throw new Error('Failed to load stations');
   const data = await res.json();
   return data.stations ?? [];
 }
 
 export async function getPublicStations(): Promise<Station[]> {
-  const res = await fetch(`${API_BASE}/api/stations`);
+  const res = await fetch(`${API_BASE_URL}/api/stations`);
   if (!res.ok) throw new Error('Failed to load stations');
   const data = await res.json();
   return data.stations ?? [];
 }
 
 export async function getStation(stationId: string): Promise<Station | null> {
-  const res = await fetch(`${API_BASE}/api/stations/${encodeURIComponent(stationId)}`);
+  const res = await fetch(`${API_BASE_URL}/api/stations/${encodeURIComponent(stationId)}`);
   if (res.status === 404) return null;
   if (!res.ok) throw new Error('Failed to load station');
   const data = await res.json();
@@ -309,7 +309,7 @@ export async function createStation(params: {
   petrolCapacity: number;
   dieselCapacity: number;
 }): Promise<{ station: Station; credentials?: { username: string; password?: string } }> {
-  const res = await fetch(`${API_BASE}/api/admin/stations`, {
+  const res = await fetch(`${API_BASE_URL}/api/admin/stations`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(params),
@@ -323,7 +323,7 @@ export async function createStation(params: {
 }
 
 export async function sendCustomerOtp(params: { nic: string; phone: string }): Promise<{ devOtp?: string }> {
-  const res = await fetch(`${API_BASE}/api/customers/otp/send`, {
+  const res = await fetch(`${API_BASE_URL}/api/customers/otp/send`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(params),
@@ -336,7 +336,7 @@ export async function sendCustomerOtp(params: { nic: string; phone: string }): P
 }
 
 export async function verifyCustomerOtp(params: { nic: string; phone: string; otp: string }): Promise<void> {
-  const res = await fetch(`${API_BASE}/api/customers/otp/verify`, {
+  const res = await fetch(`${API_BASE_URL}/api/customers/otp/verify`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(params),
@@ -370,7 +370,7 @@ export interface CustomerRecord extends CustomerRegistrationPayload {
 }
 
 export async function getCustomer(id: string): Promise<CustomerRecord | null> {
-  const res = await fetch(`${API_BASE}/api/customers/${encodeURIComponent(id)}`);
+  const res = await fetch(`${API_BASE_URL}/api/customers/${encodeURIComponent(id)}`);
   if (res.status === 404) return null;
   if (!res.ok) throw new Error('Failed to load customer');
   const data = await res.json();
@@ -379,7 +379,7 @@ export async function getCustomer(id: string): Promise<CustomerRecord | null> {
 
 /** Login with NIC + phone after OTP verified. Returns customer or throws (e.g. not found). */
 export async function customerLogin(nic: string, phone: string): Promise<CustomerRecord> {
-  const res = await fetch(`${API_BASE}/api/customers/login`, {
+  const res = await fetch(`${API_BASE_URL}/api/customers/login`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ nic: nic.trim(), phone: phone.trim() }),
@@ -392,7 +392,7 @@ export async function customerLogin(nic: string, phone: string): Promise<Custome
 }
 
 export async function sendCustomerQrToWhatsApp(customerId: string): Promise<void> {
-  const res = await fetch(`${API_BASE}/api/customers/${encodeURIComponent(customerId)}/qr/whatsapp`, {
+  const res = await fetch(`${API_BASE_URL}/api/customers/${encodeURIComponent(customerId)}/qr/whatsapp`, {
     method: 'POST',
   });
   if (!res.ok) {
@@ -402,7 +402,7 @@ export async function sendCustomerQrToWhatsApp(customerId: string): Promise<void
 }
 
 export async function registerCustomer(payload: CustomerRegistrationPayload): Promise<CustomerRecord> {
-  const res = await fetch(`${API_BASE}/api/customers/register`, {
+  const res = await fetch(`${API_BASE_URL}/api/customers/register`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(payload),

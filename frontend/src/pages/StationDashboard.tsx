@@ -16,6 +16,8 @@ import type { Station } from '@/lib/api';
 const defaultStation = (id: string): Station => ({
   id,
   name: `Station ${id}`,
+  lat: 0,
+  lng: 0,
   petrolStock: 0,
   dieselStock: 0,
   petrolCapacity: 30000,
