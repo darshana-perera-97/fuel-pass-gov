@@ -1,13 +1,35 @@
 const qrcode = require('qrcode-terminal');
 const { Client, LocalAuth, MessageMedia } = require('whatsapp-web.js');
 const qr = require('qrcode');
+const fs = require('fs');
 
 let client = null;
 let ready = false;
 
+function pickExecutablePath() {
+  const explicit =
+    process.env.PUPPETEER_EXECUTABLE_PATH ||
+    process.env.CHROME_PATH ||
+    process.env.CHROMIUM_PATH;
+  if (explicit && fs.existsSync(String(explicit))) return String(explicit);
+
+  // Common Linux paths (Ubuntu/Debian)
+  const candidates = [
+    '/usr/bin/google-chrome-stable',
+    '/usr/bin/google-chrome',
+    '/usr/bin/chromium-browser',
+    '/usr/bin/chromium',
+  ];
+  for (const p of candidates) {
+    if (fs.existsSync(p)) return p;
+  }
+  return undefined;
+}
+
 function startWhatsApp() {
   if (client) return client;
 
+  const executablePath = pickExecutablePath();
   client = new Client({
     authStrategy: new LocalAuth({ clientId: 'fuel-pass-gov' }),
     puppeteer: {
@@ -20,6 +42,7 @@ function startWhatsApp() {
         '--single-process',
       ],
       headless: true,
+      ...(executablePath ? { executablePath } : {}),
     },
   });
 
@@ -46,6 +69,11 @@ function startWhatsApp() {
     client = null;
     // eslint-disable-next-line no-console
     console.error('[WhatsApp] Initialization failed (server continues without WhatsApp):', err.message || err);
+    // eslint-disable-next-line no-console
+    console.error(
+      '[WhatsApp] Ubuntu fix: install Chromium/Chrome and dependencies, or run with DISABLE_WHATSAPP=1. ' +
+      'Optional: set CHROME_PATH or PUPPETEER_EXECUTABLE_PATH to your browser binary.'
+    );
   });
   return client;
 }

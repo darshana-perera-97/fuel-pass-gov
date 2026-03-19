@@ -13,6 +13,11 @@ app.use(express.json());
 
 // Start WhatsApp client asynchronously so server stays up if it fails (e.g. puppeteer error).
 setImmediate(() => {
+  if (String(process.env.DISABLE_WHATSAPP || '').trim() === '1') {
+    // eslint-disable-next-line no-console
+    console.log('[WhatsApp] Disabled via DISABLE_WHATSAPP=1');
+    return;
+  }
   try {
     startWhatsApp();
   } catch (err) {
